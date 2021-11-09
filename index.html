@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mohave:ital,wght@1,300&display=swap" rel="stylesheet">
 
+    <script src="/socket.io/socket.io.js"></script>
     <style>
         body {
             font-size: 16px;
@@ -97,8 +98,8 @@
         <main class="grid-container">
             <div class="grid-item">
                 <span class="grid-item--label">temperature</span>
-                <span class="display-text">
-                    20.8 C°
+                <span class="display-text" id="temperature">
+                    ?? C°
                 </span>
             </div>
             <div class="grid-item">
@@ -114,8 +115,8 @@
             </div>
             <div class="grid-item">
                 <span class="grid-item--label">humidity</span>
-                <span class="display-text">
-                    40.9 %RH
+                <span class="display-text" id="humidity">
+                    ?? %RH
                 </span>
             </div>
             <div class="grid-item">
@@ -131,7 +132,7 @@
             </div>
             <div class="grid-item">
                 <span class="grid-item--label">natural light</span>
-                <meter min="0" max="100" optimum="50" value="29" high="75" low="25"></meter>
+                <meter id="light" min="0" max="100" optimum="50" value="0" high="75" low="25"></meter>
             </div>
             <div class="grid-item">
                 <span class="grid-item--label">artificial light</span>
@@ -142,55 +143,56 @@
 
 </body>
 <script>
-    function closeWindow() {
-        console.log('closing window')
-    }
-
-    function openWindow() {
-        console.log('opening window')
-    }
-
-    function startHeater() {
-        console.log('starting heater')
-    }
-
-    function stopHeater() {
-        console.log('stopping heater')
-    }
+    // Establishing connection with server
+    const socket = io();
 
     let lightSlide = document.querySelector('#light-range'),
         windowOpen = document.querySelector("#window-open"),
         windowClose = document.querySelector("#window-close"),
         heaterOn = document.querySelector("#heater-on"),
-        heaterOff = document.querySelector("#heater-off");
+        heaterOff = document.querySelector("#heater-off"),
+        light = document.querySelector('#light'),
+        humidity = document.querySelector("#humidity"),
+        temperature = document.querySelector('#temperature')
 
+    socket.on('newMeasurements', (data) => {
+        console.log(data)
+        light.value = data.light
+        humidity.innerHTML = data.hum + ' %RH'
+        temperature.innerHTML = data.temp + ' C°'
+    })
 
     lightSlide.onchange = function () {
         console.log('light intensity: ' + lightSlide.value)
+        socket.emit('setLight', '{"intensity": ' + lightSlide.value +'}')
     }
 
-    windowOpen.onclick = function(){
+    windowOpen.onclick = function () {
         windowOpen.classList.add('button--active')
         windowClose.classList.remove('button--active')
         console.log('opening window')
+        socket.emit('setWindow', '{"state": 1}')
     }
 
-    windowClose.onclick = function(){
+    windowClose.onclick = function () {
         windowClose.classList.add('button--active')
         windowOpen.classList.remove('button--active')
         console.log('closing window')
+        socket.emit('setWindow', '{"state": 0}')
     }
 
-    heaterOn.onclick = function() {
+    heaterOn.onclick = function () {
         heaterOn.classList.add('button--active')
         heaterOff.classList.remove('button--active')
         console.log('starting heater')
+        socket.emit('setHeater', '{"state": 1}')
     }
 
-    heaterOff.onclick = function() {
+    heaterOff.onclick = function () {
         heaterOff.classList.add('button--active')
         heaterOn.classList.remove('button--active')
         console.log('stopping heater')
+        socket.emit('setHeater', '{"state": 0}')
     }
 </script>
 
