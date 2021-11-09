@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenhouse controller</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mohave:ital,wght@1,300&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-size: 16px;
+            background-color: #efefef;
+            font-family: 'Mohave', sans-serif;
+        }
+
+        .wrapper {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-container {
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 1rem;
+            background: #fefefe;
+            -webkit-box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .grid-item {
+            height: 170px;
+            /* border: 1px solid #aaa; */
+
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .grid-item--label {
+            position: absolute;
+            top: 1.25rem;
+            left: 0.25rem;
+        }
+
+        .display-text {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        meter,
+        input {
+            width: 50%;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .button {
+            cursor: pointer;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+        }
+
+        .button--green {
+            background-color: #37ee63;
+        }
+
+        .button--red {
+            background-color: #ff6133;
+        }
+
+        .button:not(.button--active) {
+            background-color: #dbdbdb;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <main class="grid-container">
+            <div class="grid-item">
+                <span class="grid-item--label">temperature</span>
+                <span class="display-text">
+                    20.8 C°
+                </span>
+            </div>
+            <div class="grid-item">
+                <span class="grid-item--label">heater</span>
+                <div class="button-group">
+                    <div class="button button--green" id="heater-on">
+                        on
+                    </div>
+                    <div class="button button--red button--active" id="heater-off">
+                        off
+                    </div>
+                </div>
+            </div>
+            <div class="grid-item">
+                <span class="grid-item--label">humidity</span>
+                <span class="display-text">
+                    40.9 %RH
+                </span>
+            </div>
+            <div class="grid-item">
+                <span class="grid-item--label">window</span>
+                <div class="button-group">
+                    <div class="button button--green button--active" id="window-open">
+                        open
+                    </div>
+                    <div class="button button--red" id="window-close">
+                        closed
+                    </div>
+                </div>
+            </div>
+            <div class="grid-item">
+                <span class="grid-item--label">natural light</span>
+                <meter min="0" max="100" optimum="50" value="29" high="75" low="25"></meter>
+            </div>
+            <div class="grid-item">
+                <span class="grid-item--label">artificial light</span>
+                <input type="range" min="1" max="100" value="50" id="light-range">
+            </div>
+        </main>
+    </div>
+
+</body>
+<script>
+    function closeWindow() {
+        console.log('closing window')
+    }
+
+    function openWindow() {
+        console.log('opening window')
+    }
+
+    function startHeater() {
+        console.log('starting heater')
+    }
+
+    function stopHeater() {
+        console.log('stopping heater')
+    }
+
+    let lightSlide = document.querySelector('#light-range'),
+        windowOpen = document.querySelector("#window-open"),
+        windowClose = document.querySelector("#window-close"),
+        heaterOn = document.querySelector("#heater-on"),
+        heaterOff = document.querySelector("#heater-off");
+
+
+    lightSlide.onchange = function () {
+        console.log('light intensity: ' + lightSlide.value)
+    }
+
+    windowOpen.onclick = function(){
+        windowOpen.classList.add('button--active')
+        windowClose.classList.remove('button--active')
+        console.log('opening window')
+    }
+
+    windowClose.onclick = function(){
+        windowClose.classList.add('button--active')
+        windowOpen.classList.remove('button--active')
+        console.log('closing window')
+    }
+
+    heaterOn.onclick = function() {
+        heaterOn.classList.add('button--active')
+        heaterOff.classList.remove('button--active')
+        console.log('starting heater')
+    }
+
+    heaterOff.onclick = function() {
+        heaterOff.classList.add('button--active')
+        heaterOn.classList.remove('button--active')
+        console.log('stopping heater')
+    }
+</script>
+
+</html>
