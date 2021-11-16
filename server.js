@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
 
 /*
     Name - getLight
-    Purpose - TODO
+    Purpose - gets the raw light intensity from the device and does a rough normalization and sets it in the object to send to frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -85,7 +85,7 @@ function getLight(){
 
 /*
     Name - getTemp
-    Purpose - TODO
+    Purpose - Gets the temperature reading from the device and sets it in the object to send to the frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -102,7 +102,7 @@ function getTemp(){
 
 /*
     Name - getHumidity
-    Purpose - TODO
+    Purpose - gets the humidity reading from the device and sets it in the object to send to the frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -119,7 +119,7 @@ function getHumidity(){
 
 /*
     Name - getWindowState
-    Purpose - TODO
+    Purpose - gets the current state of the window and sets it in the object to send to the frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -137,7 +137,7 @@ function getWindowState(){
 
 /*
     Name - getHeaterState
-    Purpose - TODO
+    Purpose - gets the current state of the heater and sets it in the object to send to the frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -154,7 +154,7 @@ function getHeaterState(){
 
 /*
     Name - getArtificialLightIntensity
-    Purpose - TODO
+    Purpose - gets the current intensity of the artificial light and sets it in the object to send to the frontend
     Description of inputs - There are none
     Description of return values - There are none
 */
@@ -173,8 +173,8 @@ function getArtificialLightIntensity(){
 
 /*
     Name - getData
-    Purpose - TODO
-    Description of inputs - TODO
+    Purpose - starts collection of data from device and emits an event for the frontend afterwards.
+    Description of inputs - the socket to emit on
     Description of return values - There are none
 */
 function getData(socket) {
@@ -197,8 +197,8 @@ function handleSetLight(data) {
 
 /*
     Name - setLight
-    Purpose - TODO
-    Description of inputs - TODO
+    Purpose - sets the intensity of the light
+    Description of inputs - the intensity to set the light to
     Description of return values - There are none
 */
 function setLight(intensity) {
@@ -221,8 +221,8 @@ function handleSetWindow(data) {
 
 /*
     Name - setServo
-    Purpose - TODO
-    Description of inputs - TODO
+    Purpose - sets the servo position of the servo
+    Description of inputs - the position to set the servo to
     Description of return values - There are none
 */
 function setServo(position) {
@@ -246,9 +246,9 @@ function handleSetHeater(data) {
 }
 
 /*
-    Name - getLight
-    Purpose - TODO
-    Description of inputs - TODO
+    Name - setHeater
+    Purpose - sets the state of the heater
+    Description of inputs - state for the heater to be in
     Description of return values - There are none
 */
 function setHeater(state){
@@ -267,21 +267,3 @@ io.listen(server)
 
 // Displaying a console message for user feedback
 console.log("Server Running ...")
-
-/*
-    Name - getLight
-    Purpose - TODO
-    Description of inputs - TODO
-    Description of return values - There are none
-*/
-function execute(script, args) {
-    if (!args)
-        args = []
-    execFile('./scripts/' + script, args, (error, stdout, stderr) => {
-        if (error) {
-            console.error('stderr', stderr);
-            throw error;
-        }
-        console.log(stdout);
-    })
-}
