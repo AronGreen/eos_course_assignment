@@ -19,12 +19,12 @@ int main(int argc, char* argv[]){
 	if (iss >> arg){
 		if (arg == "hum")
 		{
-			cout << s.getHumidity() << endl;
+			cout << s.getHumidity();
 			return 0;
 		}
 		else if (arg =="temp")
 		{
-			cout << s.getTemperature() << endl;
+			cout << s.getTemperature();
 			return 0;
 		}
 		else {

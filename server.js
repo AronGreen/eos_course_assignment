@@ -36,63 +36,173 @@ var server = http.createServer(function (req, res) {
 }).listen(8888);
 
 // Loading socket io module
-const { Server } = require("socket.io");
+const {
+    Server
+} = require("socket.io");
+
 const io = new Server({});
+
+
+let readData = {
+    light: 0,
+    hum: 0,
+    temp: 0,
+    windowState: 0,
+    heaterState: 0,
+    artificialLightIntensity: 0
+}
+
 io.on('connection', function (socket) {
     getData(socket)
     socket.on('setLight', handleSetLight);
     socket.on('setWindow', handleSetWindow);
     socket.on('setHeater', handleSetHeater);
 
-    setInterval(getData, 3000, socket);
+    setInterval(getData, 5000, socket);
 });
 
-function getRandom(min, max) {
-    return (Math.random() * (max - min) + min).toFixed(2);
-  }
 
-function getData (socket){
-    socket.emit("newMeasurements", { 'light': getRandom(0, 100), 'temp': getRandom(15, 30), 'hum': getRandom(35, 65)} )
+function getLight(){
+    // 1000 - 3500
+
+    execFile('./scripts/LDRRead.sh', (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        result = ((stdout - 1000) / 25) + ''
+        console.log('light: ' + result);
+        readData.light = result
+    })
 }
+
+function getTemp(){
+    execFile('./scripts/humidity', ['temp'], (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log(stdout);
+        readData.temp = stdout
+    })
+}
+
+function getHumidity(){
+    execFile('./scripts/humidity', ['hum'], (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log('hum: ' + stdout);
+        readData.hum = stdout
+    })
+}
+
+function getWindowState(){
+    execFile('./scripts/windowRead.sh', (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        result = stdout == 1000000 ? 0 : 1
+        console.log('window ' + result);
+        readData.windowState = result
+    })
+}
+
+function getHeaterState(){
+    execFile('./scripts/heaterRead.sh', (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log('heater ' + stdout);
+        readData.heaterState = stdout
+    }) 
+}
+
+function getArtificialLightIntensity(){
+    execFile('./scripts/LEDRead.sh', (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        dc = stdout
+        percent = (dc * 100) / 20000000
+        console.log('art light: ' + percent + '%');
+        readData.artificialLightIntensity = percent
+    }) 
+}
+
+
+function getData(socket) {
+    getTemp()
+    getLight()
+    getWindowState()
+    getHeaterState()
+    getArtificialLightIntensity()
+    getHumidity()
+
+    socket.emit("newMeasurements", readData)
+}
+
+
 
 // Change led state when a button is pressed
 function handleSetLight(data) {
-    var newData = JSON.parse(data);
-    console.log("Light intensity: " + newData.intensity);
+    var parsedData = JSON.parse(data);
+    console.log("Light intensity: " + parsedData.intensity);
+    setLight(parsedData.intensity)
+}
 
-    // execFile('./Humidity19', (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error('stderr', stderr);
-    //         throw error;
-    //     }
-    //     console.log(stdout);
-    // });
+function setLight(intensity) {
+    // execute('LEDControl', [intensity])
+    execFile('./scripts/LEDControl', [intensity], (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log(stdout);
+    })
 }
 
 function handleSetWindow(data) {
-    var newData = JSON.parse(data);
-    console.log("Set window: " + newData.state);
+    var parsedData = JSON.parse(data);
+    console.log("Set window: " + parsedData.state);
 
-    // execFile('./Humidity19', (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error('stderr', stderr);
-    //         throw error;
-    //     }
-    //     console.log(stdout);
-    // });
+    setServo(parsedData.state)
+}
+
+function setServo(position) {
+    // 0 - 1
+    // execute('a.out', [position])
+    execFile('./scripts/a.out', [position], (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log(stdout);
+    })
 }
 
 function handleSetHeater(data) {
-    var newData = JSON.parse(data);
-    console.log("Set heater: " + newData.state);
+    console.log(data)
+    var parsedData = JSON.parse(data);
+    console.log("Set heater: " + parsedData.state);
 
-    // execFile('./Humidity19', (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error('stderr', stderr);
-    //         throw error;
-    //     }
-    //     console.log(stdout);
-    // });
+    setHeater(parsedData.state)
+}
+
+function setHeater(state){
+
+    // execute('heaterWrite.sh', [state])
+    execFile('./scripts/heaterWrite.sh', [state], (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log(stdout);
+    })
 }
 
 io.listen(server)
@@ -101,4 +211,14 @@ io.listen(server)
 console.log("Server Running ...")
 
 
-
+function execute(script, args) {
+    if (!args)
+        args = []
+    execFile('./scripts/' + script, args, (error, stdout, stderr) => {
+        if (error) {
+            console.error('stderr', stderr);
+            throw error;
+        }
+        console.log(stdout);
+    })
+}
