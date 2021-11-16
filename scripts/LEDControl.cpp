@@ -1,3 +1,8 @@
+/*
+    Filename - LEDControl.cpp
+    Author - Aron Kjærgaard, Kiril Iliev, Martin Tsvetkov
+    Date - 16/11/2021
+*/
 
 #include<cstdlib>
 #include<sys/types.h>
@@ -11,8 +16,15 @@
 #include<stdio.h>
 using namespace std;
 
+// The pwm path of the artificial light LED
 #define ANALOG_PATH "/sys/class/pwm/pwmchip1/pwm-1:0"
 
+/*
+    Name - write
+    Purpose - To write a value into a specific file given a specific path
+    Description of inputs - String representations of the path, filename and value
+    Description of return values - Returns 0 if passed successfully and -1 and a perror if not
+*/
 int write(string path, string filename, string value)
 {
     ofstream fs;
@@ -27,6 +39,13 @@ int write(string path, string filename, string value)
     return 0;
 }
 
+/*
+    Name - write
+    Purpose - Overloaded function that makes it easier to write a value to file
+    Description of inputs - String representations of the path, filename and integer value
+    Description of return values - Returns 0 if passed successfully and -1 and a perror if not
+    as it only casts the integer into string
+*/
 int write(string path, string filename, int value)
 {
     stringstream s;
@@ -34,6 +53,12 @@ int write(string path, string filename, int value)
     return write(path,filename,s.str());
 }
 
+/*
+    Name - exec
+    Purpose - To run a bash command and return the console return 
+    Description of inputs - A character pointer array that represents the command
+    Description of return values - Returns the result or throws a runtime_error if the pipe open fails or char buffer is full
+*/
 string exec(const char* cmd)
 {
     char buffer[256];
@@ -55,6 +80,12 @@ string exec(const char* cmd)
     return result;
 }
 
+/*
+    Name - validatePWM
+    Purpose - To validate if the pin is exported and configured to be in PWM mode
+    Description of inputs - There are none
+    Description of return values - Returns 0 if passed successfully and -1
+*/
 int validatePWM()
 {
     string s(exec("config-pin -q P9_22"));
@@ -89,6 +120,12 @@ int validatePWM()
     return 0;
 }
 
+/*
+    Name - light
+    Purpose - To initialize the period, duty cycle and then enable the PWM pin
+    Description of inputs - The percentage of brightness to set 
+    Description of return values - Returns -1 if not successful
+*/
 int light(int percent)
 {
     if(validatePWM() != 0)
@@ -97,7 +134,7 @@ int light(int percent)
     }
 
     int period = 20000000;
-    int duty_cycle = (percent * period) / 100;
+    int duty_cycle = (percent * period) / 1000;
 
     write(ANALOG_PATH, "/period", period);
     write(ANALOG_PATH, "/duty_cycle", duty_cycle);

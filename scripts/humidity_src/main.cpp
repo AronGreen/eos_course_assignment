@@ -1,3 +1,8 @@
+/*
+    Filename - main.cpp
+    Author - Aron Kjærgaard, Kiril Iliev, Martin Tsvetkov
+    Date - 16/11/2021
+*/
 
 #include "HIH8120.h"
 

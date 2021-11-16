@@ -1,9 +1,8 @@
 /*
- * HIH8120.h
- *
- *  Created on: Oct 26, 2021
- *      Author: aron
- */
+    Filename - HIH8120.h
+    Author - Aron Kjærgaard, Kiril Iliev, Martin Tsvetkov
+    Date - 16/11/2021
+*/
 
 #ifndef HIH8120_H_
 #define HIH8120_H_

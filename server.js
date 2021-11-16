@@ -1,3 +1,9 @@
+/*
+    Filename - server.js
+    Author - Aron Kjærgaard, Kiril Iliev, Martin Tsvetkov
+    Date - 16/11/2021
+*/
+
 //Loading modules
 var http = require('http');
 var fs = require('fs');
@@ -11,11 +17,7 @@ var server = http.createServer(function (req, res) {
     // requesting files
     var file = '.' + ((req.url == '/') ? '/index.html' : req.url);
     var contentType = 'text/html';
-    // Uncoment if you want to add css to your web page
-    /*
-    if(fileExtension == '.css'){
-        contentType = 'text/css';
-    }*/
+
     fs.exists(file, function (exists) {
         if (exists) {
             fs.readFile(file, function (error, content) {
@@ -61,7 +63,12 @@ io.on('connection', function (socket) {
     setInterval(getData, 5000, socket);
 });
 
-
+/*
+    Name - getLight
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getLight(){
     // 1000 - 3500
 
@@ -76,6 +83,12 @@ function getLight(){
     })
 }
 
+/*
+    Name - getTemp
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getTemp(){
     execFile('./scripts/humidity', ['temp'], (error, stdout, stderr) => {
         if (error) {
@@ -87,6 +100,12 @@ function getTemp(){
     })
 }
 
+/*
+    Name - getHumidity
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getHumidity(){
     execFile('./scripts/humidity', ['hum'], (error, stdout, stderr) => {
         if (error) {
@@ -98,6 +117,12 @@ function getHumidity(){
     })
 }
 
+/*
+    Name - getWindowState
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getWindowState(){
     execFile('./scripts/windowRead.sh', (error, stdout, stderr) => {
         if (error) {
@@ -110,6 +135,12 @@ function getWindowState(){
     })
 }
 
+/*
+    Name - getHeaterState
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getHeaterState(){
     execFile('./scripts/heaterRead.sh', (error, stdout, stderr) => {
         if (error) {
@@ -121,6 +152,12 @@ function getHeaterState(){
     }) 
 }
 
+/*
+    Name - getArtificialLightIntensity
+    Purpose - TODO
+    Description of inputs - There are none
+    Description of return values - There are none
+*/
 function getArtificialLightIntensity(){
     execFile('./scripts/LEDRead.sh', (error, stdout, stderr) => {
         if (error) {
@@ -134,7 +171,12 @@ function getArtificialLightIntensity(){
     }) 
 }
 
-
+/*
+    Name - getData
+    Purpose - TODO
+    Description of inputs - TODO
+    Description of return values - There are none
+*/
 function getData(socket) {
     getTemp()
     getLight()
@@ -146,8 +188,6 @@ function getData(socket) {
     socket.emit("newMeasurements", readData)
 }
 
-
-
 // Change led state when a button is pressed
 function handleSetLight(data) {
     var parsedData = JSON.parse(data);
@@ -155,6 +195,12 @@ function handleSetLight(data) {
     setLight(parsedData.intensity)
 }
 
+/*
+    Name - setLight
+    Purpose - TODO
+    Description of inputs - TODO
+    Description of return values - There are none
+*/
 function setLight(intensity) {
     // execute('LEDControl', [intensity])
     execFile('./scripts/LEDControl', [intensity], (error, stdout, stderr) => {
@@ -173,6 +219,12 @@ function handleSetWindow(data) {
     setServo(parsedData.state)
 }
 
+/*
+    Name - setServo
+    Purpose - TODO
+    Description of inputs - TODO
+    Description of return values - There are none
+*/
 function setServo(position) {
     // 0 - 1
     // execute('a.out', [position])
@@ -193,6 +245,12 @@ function handleSetHeater(data) {
     setHeater(parsedData.state)
 }
 
+/*
+    Name - getLight
+    Purpose - TODO
+    Description of inputs - TODO
+    Description of return values - There are none
+*/
 function setHeater(state){
 
     // execute('heaterWrite.sh', [state])
@@ -210,7 +268,12 @@ io.listen(server)
 // Displaying a console message for user feedback
 console.log("Server Running ...")
 
-
+/*
+    Name - getLight
+    Purpose - TODO
+    Description of inputs - TODO
+    Description of return values - There are none
+*/
 function execute(script, args) {
     if (!args)
         args = []
